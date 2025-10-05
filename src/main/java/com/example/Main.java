@@ -22,7 +22,7 @@ public class Main {
         String[] helpEmpty = {"usage","zone","date","sorted"};
         String[] helpMenu = {"--zone","--date","--charging","--sorted","SE1","SE2","SE3","SE4"};
         String[] prisKlassOptions = {"SE1","SE2","SE3","SE4"};
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setLenient(false);
 
         // TODO: if args have length 1, it must include: --help
@@ -34,24 +34,41 @@ public class Main {
         // TODO: SE1-SE4 & 2h-4h-8h is the only valid options for that catagory
         // TODO: Ska includera om det saknas --date --zone / fel SE? / fel datum / inget data includerat i elpriserAPI
 
+        // TODO: Förstå varför den här måste har en for() för att få testet att fungera.
         if(args.length == 0) {
             for(String allHelpEmptyOptions: helpEmpty) {
                 System.out.println(Arrays.toString(helpEmpty));
+                break;
             }
         }
 
-        if(args[0].equalsIgnoreCase("--help")) {
+
+
+        if(args.length == 1) {
+            if(args[0].equalsIgnoreCase("--help")) {
                 for(String allHelpMenuOptions: helpMenu){
                     System.out.println(Arrays.toString(helpMenu));
                 }
-        }
+            }
+        } else if(args.length == 4) {
+            if(args[0].equalsIgnoreCase("--zone")) {
+                if(checkIfValidZone(args[1], prisKlassOptions)) {
+                    if(checkIfValidDate(args[3],dateFormat)) {
 
-        if(args.length == 4) {
-
+                    } else {
+                        System.out.println("invalid date");
+                    }
+                    } else {
+                        System.out.println("invalid zone");
+                    }
+            } else {
+                System.out.println("");
+            }
         } else if(args.length == 6) {
 
         } else {
             missingArgumentsOptions = checkMissingArgsArugments(args);
+            // TODO: Den här borde inte fungera men den gör det.
             if(missingArgumentsOptions == missingDateArgument) {
                 System.out.println("date required");
             } else {
@@ -61,19 +78,7 @@ public class Main {
             }
         }
 
-        if(args[0].equalsIgnoreCase("--zone")) {
-            if(checkIfValidZone(args[1],prisKlassOptions)) {
-//                if(checkIfValidDate(args[3],dateFormat)) {
-//
-//                } else {
-//                    System.out.println("invalid date");
-//                }
-            } else {
-                System.out.println("invalid zone");
-            }
-        } else {
-            System.out.println("");
-        }
+        // shallUseThisMaybeLater(args, prisKlassOptions);
 
 
         for (int i = 0; i < args.length;i++) {
@@ -95,6 +100,22 @@ public class Main {
 
         LocalDate testDate = LocalDate.now();
 
+    }
+
+    private static void shallUseThisMaybeLater(String[] args, String[] prisKlassOptions) {
+        if(args[0].equalsIgnoreCase("--zone")) {
+            if(checkIfValidZone(args[1], prisKlassOptions)) {
+//                if(checkIfValidDate(args[3],dateFormat)) {
+//
+//                } else {
+//                    System.out.println("invalid date");
+//                }
+            } else {
+                System.out.println("invalid zone");
+            }
+        } else {
+            System.out.println("");
+        }
     }
 
     private static int checkMissingArgsArugments(String[] args) {
