@@ -14,7 +14,7 @@ public class Main {
 
         String[] helpEmpty = {"usage","zone","date","sorted"};
         String[] helpMenu = {"--zone","--date","--charging","--sorted","SE1","SE2","SE3","SE4"};
-
+        String[] prisKlassOptions = {"SE1","SE2","SE3","SE4"};
 
         // TODO: if args have length 1, it must include: --help
         // TODO: if args have length 4 or more, it must include: --zone , SE? , --date , 20??-??-??
@@ -31,12 +31,17 @@ public class Main {
             }
         }
 
-        for(String conent: args) {
-            if(args[0].equalsIgnoreCase("--help")) {
+        if(args[0].equalsIgnoreCase("--help")) {
                 for(String allHelpMenuOptions: helpMenu){
                     System.out.println(Arrays.toString(helpMenu));
                 }
-                break;
+        }
+
+        if(args[0].equalsIgnoreCase("--zone")) {
+            if(checkIfPrisKlassIsLegit(args[1],prisKlassOptions)) {
+
+            } else {
+                System.out.println("invalid zone");
             }
         }
 
@@ -60,5 +65,9 @@ public class Main {
 
         LocalDate testDate = LocalDate.now();
 
+    }
+
+    private static boolean checkIfPrisKlassIsLegit(String args, String[] prisKlassOptions) {
+        return Arrays.asList(prisKlassOptions).contains(args);
     }
 }
