@@ -2,19 +2,28 @@ package com.example;
 
 import com.example.api.ElpriserAPI;
 
+import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.text.SimpleDateFormat;
 
 public class Main {
 
     public static void main(String[] args) {
         ElpriserAPI elpriserAPI = new ElpriserAPI();
 
+        String[] argsHelp = {"--help"};
+
+        String[] argsCheckWhatsMissing = {"--zone","--date"};
+        int missingArgumentsOptions = 0;
+        int missingDateArgument = 1;
+        int missingZoneArgument = 2;
+
         String[] helpEmpty = {"usage","zone","date","sorted"};
         String[] helpMenu = {"--zone","--date","--charging","--sorted","SE1","SE2","SE3","SE4"};
         String[] prisKlassOptions = {"SE1","SE2","SE3","SE4"};
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy");
+        dateFormat.setLenient(false);
 
         // TODO: if args have length 1, it must include: --help
         // TODO: if args have length 4 or more, it must include: --zone , SE? , --date , 20??-??-??
@@ -37,12 +46,33 @@ public class Main {
                 }
         }
 
-        if(args[0].equalsIgnoreCase("--zone")) {
-            if(checkIfPrisKlassIsLegit(args[1],prisKlassOptions)) {
+        if(args.length == 4) {
 
+        } else if(args.length == 6) {
+
+        } else {
+            missingArgumentsOptions = checkMissingArgsArugments(args);
+            if(missingArgumentsOptions == missingDateArgument) {
+                System.out.println("date required");
+            } else {
+                if(missingArgumentsOptions == missingZoneArgument) {
+                    System.out.println("zone required");
+                }
+            }
+        }
+
+        if(args[0].equalsIgnoreCase("--zone")) {
+            if(checkIfValidZone(args[1],prisKlassOptions)) {
+//                if(checkIfValidDate(args[3],dateFormat)) {
+//
+//                } else {
+//                    System.out.println("invalid date");
+//                }
             } else {
                 System.out.println("invalid zone");
             }
+        } else {
+            System.out.println("");
         }
 
 
@@ -67,7 +97,24 @@ public class Main {
 
     }
 
-    private static boolean checkIfPrisKlassIsLegit(String args, String[] prisKlassOptions) {
+    private static int checkMissingArgsArugments(String[] args) {
+        if(Arrays.asList(args).contains("--zone")) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
+
+    private static boolean checkIfValidDate(String arg,SimpleDateFormat dateFormat) {
+        try{
+            dateFormat.parse(arg);
+                    return true;
+        } catch (ParseException e) {
+            return false;
+        }
+    }
+
+    private static boolean checkIfValidZone(String args, String[] prisKlassOptions) {
         return Arrays.asList(prisKlassOptions).contains(args);
     }
 }
