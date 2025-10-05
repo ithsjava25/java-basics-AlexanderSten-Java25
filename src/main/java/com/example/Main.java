@@ -12,6 +12,7 @@ public class Main {
     public static void main(String[] args) {
         ElpriserAPI elpriserAPI = new ElpriserAPI();
 
+        String[] helpEmpty = {"usage","zone","date","sorted"};
         String[] helpMenu = {"--zone","--date","--charging","--sorted","SE1","SE2","SE3","SE4"};
 
 
@@ -23,6 +24,12 @@ public class Main {
 
         // TODO: SE1-SE4 & 2h-4h-8h is the only valid options for that catagory
         // TODO: Ska includera om det saknas --date --zone / fel SE? / fel datum / inget data includerat i elpriserAPI
+
+        if(args.length == 0) {
+            for(String allHelpEmptyOptions: helpEmpty) {
+                System.out.println(Arrays.toString(helpEmpty));
+            }
+        }
 
         for(String conent: args) {
             if(args[0].equalsIgnoreCase("--help")) {
