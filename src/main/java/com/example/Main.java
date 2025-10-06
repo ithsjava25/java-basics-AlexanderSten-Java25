@@ -6,13 +6,16 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Map;
 
 public class Main {
 
     public static void main(String[] args) {
         ElpriserAPI elpriserAPI = new ElpriserAPI();
 
-        String[] argsHelp = {"--help"};
+        ElpriserAPI.Prisklass zone;
+        String date;
 
         String[] argsCheckWhatsMissing = {"--zone","--date"};
         int missingArgumentsOptions = 0;
@@ -22,7 +25,7 @@ public class Main {
         String[] helpEmpty = {"usage","zone","date","sorted"};
         String[] helpMenu = {"--zone","--date","--charging","--sorted","SE1","SE2","SE3","SE4"};
         String[] prisKlassOptions = {"SE1","SE2","SE3","SE4"};
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         dateFormat.setLenient(false);
 
         // TODO: if args have length 1, it must include: --help
@@ -42,8 +45,7 @@ public class Main {
             }
         }
 
-
-
+        // Check if there is just one thing in args(And probably --help)
         if(args.length == 1) {
             if(args[0].equalsIgnoreCase("--help")) {
                 for(String allHelpMenuOptions: helpMenu){
@@ -53,8 +55,8 @@ public class Main {
         } else if(args.length == 4) {
             if(args[0].equalsIgnoreCase("--zone")) {
                 if(checkIfValidZone(args[1], prisKlassOptions)) {
-                    if(checkIfValidDate(args[3],dateFormat)) {
-
+                    if(args[2].equals("--date") && checkIfValidDate(args[3],dateFormat)) {
+                        System.out.println("This part is reached");
                     } else {
                         System.out.println("invalid date");
                     }
@@ -67,6 +69,7 @@ public class Main {
         } else if(args.length == 6) {
 
         } else {
+            // Kollar om vad det är som saknas från args
             missingArgumentsOptions = checkMissingArgsArugments(args);
             // TODO: Den här borde inte fungera men den gör det.
             if(missingArgumentsOptions == missingDateArgument) {
@@ -97,8 +100,6 @@ public class Main {
                 case "--sorted" -> System.out.println("sorted selected");
             }
         }
-
-        LocalDate testDate = LocalDate.now();
 
     }
 
