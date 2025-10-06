@@ -4,12 +4,17 @@ import com.example.api.ElpriserAPI;
 
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
 public class Main {
+    public enum copyPrisklass {
+        SE1,SE2,SE3,SE4
+    }
+
 
     public static void main(String[] args) {
         ElpriserAPI elpriserAPI = new ElpriserAPI();
@@ -57,6 +62,7 @@ public class Main {
                 if(checkIfValidZone(args[1], prisKlassOptions)) {
                     if(args[2].equals("--date") && checkIfValidDate(args[3],dateFormat)) {
                         System.out.println("This part is reached");
+                        List<ElpriserAPI> elpriserAPIS = elpriserAPI.getPriser(getDate(args,dateFormat),getPrisKlass(args));
                     } else {
                         System.out.println("invalid date");
                     }
@@ -138,5 +144,25 @@ public class Main {
 
     private static boolean checkIfValidZone(String args, String[] prisKlassOptions) {
         return Arrays.asList(prisKlassOptions).contains(args);
+    }
+
+
+    private static ElpriserAPI.Prisklass getPrisKlass(String[] args) {
+        ElpriserAPI.Prisklass input =
+                switch(args[1]) {
+                    case "SE1" -> ElpriserAPI.Prisklass.SE1;
+                    case "SE2" -> ElpriserAPI.Prisklass.SE2;
+                    case "SE3" -> ElpriserAPI.Prisklass.SE3;
+                    case "SE4" -> ElpriserAPI.Prisklass.SE4;
+                    default -> throw new IllegalStateException("Unexpected value: " + args[1]);
+                };
+        return input;
+    }
+
+    private static LocalDate getDate(String[] args,SimpleDateFormat date) {
+        // Tvungen att göra om den här till en DateTimeFormatter
+        // Men den här fungerar inte av nån anlending.
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(String.valueOf(date));
+        return LocalDate.parse(args[3],formatter);
     }
 }
