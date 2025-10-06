@@ -42,6 +42,9 @@ public class Main {
         // TODO: SE1-SE4 & 2h-4h-8h is the only valid options for that catagory
         // TODO: Ska includera om det saknas --date --zone / fel SE? / fel datum / inget data includerat i elpriserAPI
 
+        // TODO: Ska på nått sätt omvandla två olika string som finns i args till enum och Localdate
+        // TODO: Tar reda på NÄR jag ska använda getPriser()
+
         // TODO: Förstå varför den här måste har en for() för att få testet att fungera.
         if(args.length == 0) {
             for(String allHelpEmptyOptions: helpEmpty) {
