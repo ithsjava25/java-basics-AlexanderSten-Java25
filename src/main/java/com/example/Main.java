@@ -22,21 +22,18 @@ public class Main {
     public static int zoneValue = 1;
     public static int datePlace = 2;
     public static int dateValue = 3;
+    public static int hourSelected = 5;
 
-    public List<Integer> optionsSelected = new ArrayList<>();
+    public static int twoHours = 0;
+    public static int fourHours = 1;
+    public static int eightHours = 2;
 
-    public static String[] showSelectedOptions = new String[5];
-    public enum copyPrisklass {
-        SE1,SE2,SE3,SE4
-    }
+    public static int sortedSelected = 5;
+    public static int chargingSelected = 6;
 
     public static void main(String[] args) {
         ElpriserAPI elpriserAPI = new ElpriserAPI();
 
-        ElpriserAPI.Prisklass zone;
-        String date;
-
-        String[] argsCheckWhatsMissing = {"--zone","--date"};
         int missingArgumentsOptions = 0;
         int missingDateArgument = 1;
         int missingZoneArgument = 2;
@@ -72,7 +69,7 @@ public class Main {
                     System.out.println(Arrays.toString(helpMenu));
                 }
             }
-        } else if(args.length == 4) {
+        } else if(args.length >= 3 && args.length <= 5) {
             if(args[zonePlace].equalsIgnoreCase("--zone")) {
                 if(checkIfValidZone(args[zoneValue], prisKlassOptions)) {
                     if(args[datePlace].equals("--date") && checkIfValidDate(args[dateValue],dateFormat)) {
@@ -94,8 +91,6 @@ public class Main {
             } else {
                 System.out.println("not sure what is missing");
             }
-        } else if(args.length == 6) {
-            // TODO lägga in den så det blir if (args.length == 4 || args.length == 6);
         } else {
             // Kollar om vad det är som saknas från args
             missingArgumentsOptions = checkMissingArgsArugments(args);
@@ -117,45 +112,121 @@ public class Main {
 
     private static void choosingOptions(List<ElpriserAPI.Elpris> elprisList, String[] args) {
 
-        for (String arg : args) {
-            switch (arg) {
-                case "--zone" -> System.out.println("zone selected");
-                case "SE1" -> System.out.println("SE1 selected");
-                case "SE2" -> System.out.println("SE2 selected");
-                case "SE3" -> System.out.println("SE3 selected");
-                case "SE4" -> System.out.println("SE4 selected");
-                case "2h" -> System.out.println("2h selected");
-                case "4h" -> System.out.println("4h selected");
-                case "8h" -> System.out.println("8h selected");
-                case "--charging" -> System.out.println("charging selected");
-                case "--date" -> System.out.println("date selected");
-                case "--sorted" -> System.out.println("sorted selected");
+//        for (String arg : args) {
+//            switch (arg) {
+//                case "--zone" -> System.out.println("zone selected");
+//                case "SE1" -> System.out.println("SE1 selected");
+//                case "SE2" -> System.out.println("SE2 selected");
+//                case "SE3" -> System.out.println("SE3 selected");
+//                case "SE4" -> System.out.println("SE4 selected");
+//                case "2h" -> System.out.println("2h selected");
+//                case "4h" -> System.out.println("4h selected");
+//                case "8h" -> System.out.println("8h selected");
+//                case "--charging" -> System.out.println("charging selected");
+//                case "--date" -> System.out.println("date selected");
+//                case "--sorted" -> System.out.println("sorted selected");
+//            }
+//        }
+
+        // Jag trodde att zoneValue var den som bestämde var programmet skulle göra i början.
+        // Men istället får jag kolla efter dom --sorted / --charging FÖRST innan jag kör med zoneValue
+
+        if(args.length == 4) {
+            switch(args[zoneValue]) {
+                // displayMinMaxPrices_withValidData()
+                case "SE1" -> {
+
+                }
+                case "SE2" -> {
+
+                }
+                // displayMeanPrice_withValidData()
+                // testHourlyMinMaxPrices_with96Entries()
+                case "SE3" -> {
+                    for(int i = 0; i < elprisList.size();i++) {
+
+                    }
+                }
+                case "SE4" ->{
+
+                }
             }
+
+        } else if (args.length == sortedSelected){
+            switch(args[zoneValue]) {
+                case "SE1" -> {
+
+                }
+                // displaySortedPrices_whenRequested()
+                case "SE2" -> {
+
+                }
+                case "SE3" -> {
+
+                }
+                case "SE4" ->{
+
+                }
+            }
+
+        } else if(args.length == chargingSelected){
+            int hoursSelected = 5;
+            switch(args[hoursSelected]){
+                case "2h" -> {
+                    hoursSelected = twoHours;
+                }
+                case "4h" -> {
+                    hoursSelected = fourHours;
+                }
+                case "8h" -> {
+                    hoursSelected = eightHours;
+                }
+            }
+            switch(args[zoneValue]) {
+                // findOptimalCharging4Hours()
+                case "SE1" -> {
+
+                }
+                case "SE2" -> {
+
+                }
+                // findOptimalCharging2Hours()
+                // chargingWindowDoesNotUseNextDay_whenNextDayUnavailable()
+                // handleMultipleDaysData_includesNextDayForCharging()
+                case "SE3" -> {
+
+                }
+                // findOptimalCharging8Hours()
+                case "SE4" ->{
+
+                }
+            }
+
         }
 
-        switch (args[zoneValue]) {
-            // Den här är för displayMinMaxPrices_withValidData() /
-            case "SE1" -> {
-
-            }
-            // Den här är för displaySortedPrices_whenRequested()
-            case "SE2" -> {
-
-            }
-            // Den här är för findOptimalCharging2Hours()
-            // chargingWindowDoesNotUseNextDay_whenNextDayUnavailable()
-            // handleMultipleDaysData_includesNextDayForCharging()
-            // chargingWindowSpansToNextDay_whenCheapestCrossesMidnight()
-            // testHourlyMinMaxPrices_with96Entries()
-            case "SE3" -> {
-
-            }
-            // Den här är för findOptimalCharging8Hours()
-            case "SE4" -> {
-
-            }
-            default -> System.out.println("Error");
-        }
+//        switch (args[zoneValue]) {
+//            // Den här är för displayMinMaxPrices_withValidData() /
+//            case "SE1" -> {
+//
+//            }
+//            // Den här är för displaySortedPrices_whenRequested()
+//            case "SE2" -> {
+//
+//            }
+//            // Den här är för findOptimalCharging2Hours()
+//            // chargingWindowDoesNotUseNextDay_whenNextDayUnavailable()
+//            // handleMultipleDaysData_includesNextDayForCharging()
+//            // chargingWindowSpansToNextDay_whenCheapestCrossesMidnight()
+//            // testHourlyMinMaxPrices_with96Entries()
+//            case "SE3" -> {
+//
+//            }
+//            // Den här är för findOptimalCharging8Hours()
+//            case "SE4" -> {
+//
+//            }
+//            default -> System.out.println("Error");
+//        }
 
 
     }
