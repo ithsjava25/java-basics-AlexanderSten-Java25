@@ -5,24 +5,27 @@ import com.example.api.ElpriserAPI;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
 public class Main {
-
     // TODO Omvandla detta till en array/list
-    public static String dateSelected = "dateSelected";
-    public static String zoneSelected = "zone selected";
-    public static String chargingSelected = "charging selected";
-    public static String selected2h = "2h selected";
+//    public static String dateSelected = "dateSelected";
+//    public static String zoneSelected = "zone selected";
+//    public static String chargingSelected = "charging selected";
+//    public static String selected2h = "2h selected";
 
     public static int zonePlace = 0;
     public static int zoneValue = 1;
     public static int datePlace = 2;
     public static int dateValue = 3;
 
+    public List<Integer> optionsSelected = new ArrayList<>();
+
+    public static String[] showSelectedOptions = new String[5];
     public enum copyPrisklass {
         SE1,SE2,SE3,SE4
     }
@@ -44,17 +47,15 @@ public class Main {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         dateFormat.setLenient(false);
 
-        // TODO: if args have length 1, it must include: --help
         // TODO: if args have length 4 or more, it must include: --zone , SE? , --date , 20??-??-??
         // TODO: if args have length 5, it must include: --sorted
         // TODO: if args have length 6, it must include: --charging , ?h
-        // TODO: if any other length, it must be set as invalid.
 
         // TODO: SE1-SE4 & 2h-4h-8h is the only valid options for that catagory
         // TODO: Ska includera om det saknas --date --zone / fel SE? / fel datum / inget data includerat i elpriserAPI
 
-        // TODO: Ska på nått sätt omvandla två olika string som finns i args till enum och Localdate
-        // TODO: Tar reda på NÄR jag ska använda getPriser()
+        // TODO: Ska på nått sätt omvandla två olika string som finns i args till enum och Localdate / Tror att de är fixat
+        // TODO: Tar reda på NÄR jag ska använda getPriser() / Trora att det är fixat
 
         // TODO: Förstå varför den här måste har en for() för att få testet att fungera.
         if(args.length == 0) {
@@ -79,7 +80,11 @@ public class Main {
                         // Den här lägger till värde och hämtar det som skickas
                         List<ElpriserAPI.Elpris> elprisList = elpriserAPI.getPriser(getDate(args,dateFormat),getPrisKlass(args));
                         System.out.println(elprisList);
-                        choosingOptions(elprisList);
+                        if(elprisList.isEmpty()){
+                            System.out.println("no data");
+                        } else {
+                            choosingOptions(elprisList, args);
+                        }
                     } else {
                         System.out.println("invalid date");
                     }
@@ -90,7 +95,7 @@ public class Main {
                 System.out.println("not sure what is missing");
             }
         } else if(args.length == 6) {
-
+            // TODO lägga in den så det blir if (args.length == 4 || args.length == 6);
         } else {
             // Kollar om vad det är som saknas från args
             missingArgumentsOptions = checkMissingArgsArugments(args);
@@ -107,8 +112,14 @@ public class Main {
         // shallUseThisMaybeLater(args, prisKlassOptions);
 
 
-        for (int i = 0; i < args.length;i++) {
-            switch (args[i]) {
+
+    }
+
+    private static void choosingOptions(List<ElpriserAPI.Elpris> elprisList, String[] args) {
+
+        for (String arg : args) {
+            switch (arg) {
+                case "--zone" -> System.out.println("zone selected");
                 case "SE1" -> System.out.println("SE1 selected");
                 case "SE2" -> System.out.println("SE2 selected");
                 case "SE3" -> System.out.println("SE3 selected");
@@ -116,19 +127,35 @@ public class Main {
                 case "2h" -> System.out.println("2h selected");
                 case "4h" -> System.out.println("4h selected");
                 case "8h" -> System.out.println("8h selected");
-                case "--zone" -> System.out.println("zone selected");
                 case "--charging" -> System.out.println("charging selected");
-                case "--help" -> System.out.println("help selected");
                 case "--date" -> System.out.println("date selected");
                 case "--sorted" -> System.out.println("sorted selected");
             }
         }
 
-    }
+        switch (args[zoneValue]) {
+            // Den här är för displayMinMaxPrices_withValidData() /
+            case "SE1" -> {
 
-    private static void choosingOptions(List<ElpriserAPI.Elpris> elprisList) {
+            }
+            // Den här är för displaySortedPrices_whenRequested()
+            case "SE2" -> {
 
+            }
+            // Den här är för findOptimalCharging2Hours()
+            // chargingWindowDoesNotUseNextDay_whenNextDayUnavailable()
+            // handleMultipleDaysData_includesNextDayForCharging()
+            // chargingWindowSpansToNextDay_whenCheapestCrossesMidnight()
+            // testHourlyMinMaxPrices_with96Entries()
+            case "SE3" -> {
 
+            }
+            // Den här är för findOptimalCharging8Hours()
+            case "SE4" -> {
+
+            }
+            default -> System.out.println("Error");
+        }
 
 
     }
