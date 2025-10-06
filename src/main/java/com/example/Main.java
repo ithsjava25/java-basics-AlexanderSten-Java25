@@ -65,7 +65,9 @@ public class Main {
                 if(checkIfValidZone(args[1], prisKlassOptions)) {
                     if(args[2].equals("--date") && checkIfValidDate(args[3],dateFormat)) {
                         System.out.println("This part is reached");
-                        List<ElpriserAPI> elpriserAPIS = elpriserAPI.getPriser(getDate(args,dateFormat),getPrisKlass(args));
+                        List<ElpriserAPI.Elpris> elprisList = elpriserAPI.getPriser(getDate(args,dateFormat),getPrisKlass(args));
+                        System.out.println(elprisList);
+
                     } else {
                         System.out.println("invalid date");
                     }
@@ -164,8 +166,8 @@ public class Main {
 
     private static LocalDate getDate(String[] args,SimpleDateFormat date) {
         // Tvungen att göra om den här till en DateTimeFormatter
-        // Men den här fungerar inte av nån anlending.
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(String.valueOf(date));
+        // Men kan inte använda min SimpleDateformatter här av nån anledning
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return LocalDate.parse(args[3],formatter);
     }
 }
