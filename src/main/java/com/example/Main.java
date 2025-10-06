@@ -11,10 +11,21 @@ import java.util.List;
 import java.util.Map;
 
 public class Main {
+
+    // TODO Omvandla detta till en array/list
+    public static String dateSelected = "dateSelected";
+    public static String zoneSelected = "zone selected";
+    public static String chargingSelected = "charging selected";
+    public static String selected2h = "2h selected";
+
+    public static int zonePlace = 0;
+    public static int zoneValue = 1;
+    public static int datePlace = 2;
+    public static int dateValue = 3;
+
     public enum copyPrisklass {
         SE1,SE2,SE3,SE4
     }
-
 
     public static void main(String[] args) {
         ElpriserAPI elpriserAPI = new ElpriserAPI();
@@ -61,13 +72,14 @@ public class Main {
                 }
             }
         } else if(args.length == 4) {
-            if(args[0].equalsIgnoreCase("--zone")) {
-                if(checkIfValidZone(args[1], prisKlassOptions)) {
-                    if(args[2].equals("--date") && checkIfValidDate(args[3],dateFormat)) {
+            if(args[zonePlace].equalsIgnoreCase("--zone")) {
+                if(checkIfValidZone(args[zoneValue], prisKlassOptions)) {
+                    if(args[datePlace].equals("--date") && checkIfValidDate(args[dateValue],dateFormat)) {
                         System.out.println("This part is reached");
+                        // Den här lägger till värde och hämtar det som skickas
                         List<ElpriserAPI.Elpris> elprisList = elpriserAPI.getPriser(getDate(args,dateFormat),getPrisKlass(args));
                         System.out.println(elprisList);
-
+                        choosingOptions(elprisList);
                     } else {
                         System.out.println("invalid date");
                     }
@@ -75,7 +87,7 @@ public class Main {
                         System.out.println("invalid zone");
                     }
             } else {
-                System.out.println("");
+                System.out.println("not sure what is missing");
             }
         } else if(args.length == 6) {
 
@@ -111,6 +123,13 @@ public class Main {
                 case "--sorted" -> System.out.println("sorted selected");
             }
         }
+
+    }
+
+    private static void choosingOptions(List<ElpriserAPI.Elpris> elprisList) {
+
+
+
 
     }
 
@@ -154,12 +173,12 @@ public class Main {
 
     private static ElpriserAPI.Prisklass getPrisKlass(String[] args) {
         ElpriserAPI.Prisklass input =
-                switch(args[1]) {
+                switch(args[zoneValue]) {
                     case "SE1" -> ElpriserAPI.Prisklass.SE1;
                     case "SE2" -> ElpriserAPI.Prisklass.SE2;
                     case "SE3" -> ElpriserAPI.Prisklass.SE3;
                     case "SE4" -> ElpriserAPI.Prisklass.SE4;
-                    default -> throw new IllegalStateException("Unexpected value: " + args[1]);
+                    default -> throw new IllegalStateException("Unexpected value: " + args[zoneValue]);
                 };
         return input;
     }
@@ -168,6 +187,6 @@ public class Main {
         // Tvungen att göra om den här till en DateTimeFormatter
         // Men kan inte använda min SimpleDateformatter här av nån anledning
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return LocalDate.parse(args[3],formatter);
+        return LocalDate.parse(args[dateValue],formatter);
     }
 }
