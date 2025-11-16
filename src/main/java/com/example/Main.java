@@ -18,6 +18,10 @@ public class Main {
 //    public static String chargingSelected = "charging selected";
 //    public static String selected2h = "2h selected";
 
+
+
+
+
     public static int zonePlace = 0;
     public static int zoneValue = 1;
     public static int datePlace = 2;
@@ -30,6 +34,9 @@ public class Main {
 
     public static int sortedSelected = 5;
     public static int chargingSelected = 6;
+
+    public static double medelPriser = 0.0;
+    public static int ultimateMedelPris = 0;
 
     public static void main(String[] args) {
         ElpriserAPI elpriserAPI = new ElpriserAPI();
@@ -44,17 +51,21 @@ public class Main {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         dateFormat.setLenient(false);
 
-        // TODO: if args have length 4 or more, it must include: --zone , SE? , --date , 20??-??-??
-        // TODO: if args have length 5, it must include: --sorted
-        // TODO: if args have length 6, it must include: --charging , ?h
+        // TODO: Försöka komma på ett sätt att lägga in int value från listan till en string. Och samtidigt omvandla den till en int.
+        // TODO: Försöka förstå hur jag ska använda <Key, Value> för att fixa detta.
+        // TODO: Kom på att jag kan kolla på exemplet på ElpriserAPI
+        // Fixat: if args have length 4 or more, it must include: --zone , SE? , --date , 20??-??-??
+        // Fixat: if args have length 5, it must include: --sorted
+        // Fixat: if args have length 6, it must include: --charging , ?h
 
-        // TODO: SE1-SE4 & 2h-4h-8h is the only valid options for that catagory
-        // TODO: Ska includera om det saknas --date --zone / fel SE? / fel datum / inget data includerat i elpriserAPI
+        // SE1-SE4 & 2h-4h-8h is the only valid options for --zone / --charging
+        // Fixat: Ska includera om det saknas --date --zone / fel SE? / fel datum / inget data includerat i elpriserAPI
 
-        // TODO: Ska på nått sätt omvandla två olika string som finns i args till enum och Localdate / Tror att de är fixat
-        // TODO: Tar reda på NÄR jag ska använda getPriser() / Trora att det är fixat
+        // Fixat??? Ska på nått sätt omvandla två olika string som finns i args till enum och Localdate
+        // Fixat??? Tar reda på NÄR jag ska använda getPriser()
 
         // TODO: Förstå varför den här måste har en for() för att få testet att fungera.
+        // Check if there args is empty and then put up a help menu
         if(args.length == 0) {
             for(String allHelpEmptyOptions: helpEmpty) {
                 System.out.println(Arrays.toString(helpEmpty));
@@ -76,10 +87,10 @@ public class Main {
                         System.out.println("This part is reached");
                         // Den här lägger till värde och hämtar det som skickas
                         List<ElpriserAPI.Elpris> elprisList = elpriserAPI.getPriser(getDate(args,dateFormat),getPrisKlass(args));
-                        System.out.println(elprisList);
                         if(elprisList.isEmpty()){
                             System.out.println("no data");
                         } else {
+                            // Kör igång med själva programmet
                             choosingOptions(elprisList, args);
                         }
                     } else {
@@ -130,6 +141,8 @@ public class Main {
 
         // Jag trodde att zoneValue var den som bestämde var programmet skulle göra i början.
         // Men istället får jag kolla efter dom --sorted / --charging FÖRST innan jag kör med zoneValue
+        // Enklaste sättet att göra det är kolla längden på args.
+        // Men jag vet att det finns ett enklare och med SÄKERT sätt att göra det.
 
         if(args.length == 4) {
             switch(args[zoneValue]) {
@@ -143,9 +156,15 @@ public class Main {
                 // displayMeanPrice_withValidData()
                 // testHourlyMinMaxPrices_with96Entries()
                 case "SE3" -> {
-                    for(int i = 0; i < elprisList.size();i++) {
-
+                    medelPriser = 0.0;
+                    for(ElpriserAPI.Elpris pris : elprisList) {
+                        medelPriser = medelPriser + pris.sekPerKWh();
                     }
+                    medelPriser = medelPriser / elprisList.size();
+                    ultimateMedelPris = (int) Math.round(medelPriser * 100);
+                    System.out.println("medelpris");
+                    System.out.println(ultimateMedelPris);
+
                 }
                 case "SE4" ->{
 
@@ -154,19 +173,19 @@ public class Main {
 
         } else if (args.length == sortedSelected){
             switch(args[zoneValue]) {
-                case "SE1" -> {
-
-                }
+//                case "SE1" -> {
+//
+//                }
                 // displaySortedPrices_whenRequested()
                 case "SE2" -> {
 
                 }
-                case "SE3" -> {
-
-                }
-                case "SE4" ->{
-
-                }
+//                case "SE3" -> {
+//
+//                }
+//                case "SE4" ->{
+//
+//                }
             }
 
         } else if(args.length == chargingSelected){
@@ -187,9 +206,9 @@ public class Main {
                 case "SE1" -> {
 
                 }
-                case "SE2" -> {
-
-                }
+//                case "SE2" -> {
+//
+//                }
                 // findOptimalCharging2Hours()
                 // chargingWindowDoesNotUseNextDay_whenNextDayUnavailable()
                 // handleMultipleDaysData_includesNextDayForCharging()
