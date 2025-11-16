@@ -144,6 +144,8 @@ public class Main {
         // Enklaste sättet att göra det är kolla längden på args.
         // Men jag vet att det finns ett enklare och med SÄKERT sätt att göra det.
 
+        // TODO: Fixa ett system som kollar hur många priser det finns på prislistan och sen välja en case för den.
+
         if(args.length == 4) {
             switch(args[zoneValue]) {
                 // displayMinMaxPrices_withValidData()
@@ -156,14 +158,19 @@ public class Main {
                 // displayMeanPrice_withValidData()
                 // testHourlyMinMaxPrices_with96Entries()
                 case "SE3" -> {
-                    medelPriser = 0.0;
-                    for(ElpriserAPI.Elpris pris : elprisList) {
-                        medelPriser = medelPriser + pris.sekPerKWh();
+                    if(elprisList.size() == 4) {
+                        medelPriser = 0.0;
+                        for (ElpriserAPI.Elpris pris : elprisList) {
+                            medelPriser = medelPriser + pris.sekPerKWh();
+                        }
+                        medelPriser = medelPriser / elprisList.size();
+                        ultimateMedelPris = (int) Math.round(medelPriser * 100);
+                        System.out.println("medelpris");
+                        System.out.println(ultimateMedelPris);
                     }
-                    medelPriser = medelPriser / elprisList.size();
-                    ultimateMedelPris = (int) Math.round(medelPriser * 100);
-                    System.out.println("medelpris");
-                    System.out.println(ultimateMedelPris);
+                    else if(elprisList.size() == 96) {
+
+                    }
 
                 }
                 case "SE4" ->{
