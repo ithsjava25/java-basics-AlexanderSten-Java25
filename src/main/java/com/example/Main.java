@@ -110,14 +110,19 @@ public class Main {
                 if(checkIfValidZone(args[zoneValue], prisKlassOptions)) {
                     if(args[datePlace].equals("--date") && checkIfValidDate(args[dateValue],dateFormat)) {
                         System.out.println("This part is reached");
+                        // Först måste jag fixa två st datum när testerna skickar två st mockjson
+                        LocalDate firstDate = getDate(args,dateFormat);
+                        LocalDate secondDate = firstDate.plusDays(1);
+
                         // Den här lägger till värde och hämtar det som skickas
-                        List<ElpriserAPI.Elpris> elprisList = elpriserAPI.getPriser(getDate(args,dateFormat),getPrisKlass(args));
+                        List<ElpriserAPI.Elpris> elprisList = elpriserAPI.getPriser(firstDate,getPrisKlass(args));
                         if(elprisList.isEmpty()){
                             System.out.println("no data");
-                        } else {
-                            // Kör igång med själva programmet
-                            choosingOptions(elprisList, args);
                         }
+                        // Fixar den andra (Jag vet inte hur jag kollar om det finns ett andra datum eller ej så man
+                        List<ElpriserAPI.Elpris> elprisListTommorow = elpriserAPI.getPriser(secondDate,getPrisKlass(args));
+                        elprisList.addAll(elprisListTommorow);
+                        choosingOptions(elprisList, args);
                     } else {
                         System.out.println("invalid date");
                     }
@@ -229,7 +234,7 @@ public class Main {
                 case "SE2" -> {
                     String hours;
                     String priset;
-                    sortedList.sort(Comparator.comparingDouble(ElpriserAPI.Elpris::sekPerKWh));
+                    sortedList.sort(Comparator.comparingDouble(ElpriserAPI.Elpris::sekPerKWh).reversed());
                     for(ElpriserAPI.Elpris pris : sortedList) {
                         hours = String.format("%02d-%02d"
                                 ,pris.timeStart().getHour()
