@@ -37,14 +37,17 @@ public class Main {
     public static double medelPriser = 0.0;
     public static double ultimateMedelPris = 0;
     // Cheapest / Expensive hour - value
-    public static int cheapestHour1;
-    public static int cheapestHour2;
+    public static int cheapestHourStart;
+    public static int cheapestHourEnd;
     public static String combinedCheapestHours;
-    public static int expensiveHour1;
-    public static int expensiveHour2;
+    public static int expensiveHourStart;
+    public static int expensiveHourEnd;
     public static String combinedExpensiveHours;
     public static double cheapestHourValue = Double.MAX_VALUE;
     public static double expensiveHourValue = Double.MIN_VALUE;
+    // Charging hours
+    public static double averageCheapestHours = Double.MAX_VALUE;
+    public static double hoursAverage = 0.0;
 
 
 
@@ -105,7 +108,7 @@ public class Main {
                     System.out.println(Arrays.toString(helpMenu));
                 }
             }
-        } else if(args.length >= 3 && args.length <= 5) {
+        } else if(args.length >= 3 && args.length <= 6) {
             if(args[zonePlace].equalsIgnoreCase("--zone")) {
                 if(checkIfValidZone(args[zoneValue], prisKlassOptions)) {
                     if(args[datePlace].equals("--date") && checkIfValidDate(args[dateValue],dateFormat)) {
@@ -175,7 +178,8 @@ public class Main {
         // Men jag vet att det finns ett enklare och med SÄKERT sätt att göra det.
 
         // TODO: Fixa ett system som kollar hur många priser det finns på prislistan och sen välja en case för den.
-
+        // TODO: Fixa en samling av resets.
+        medelPriser = 0.0;
         if(args.length == 4) {
             switch(args[zoneValue]) {
                 // displayMinMaxPrices_withValidData()
@@ -261,6 +265,25 @@ public class Main {
                 }
                 case "4h" -> {
                     hoursSelected = fourHours;
+                    int hours4 = 4;
+                    int beginningHour = 0;
+                    for(int i = 0; i < elprisList.size() - hours4; i++) {
+                        for(int j = 0; j < hours4; j++){
+                            medelPriser = medelPriser + elprisList.get(i+j).sekPerKWh();
+                        }
+                        hoursAverage = medelPriser / hours4;
+                        if (hoursAverage < averageCheapestHours) {
+                            averageCheapestHours = hoursAverage;
+                            beginningHour = i;
+                        }
+
+                    }
+
+                    medelPriser = (medelPriser * 100) / hours4;
+                    System.out.println("påbörja laddning");
+                    System.out.println(String.format("%02d",elprisList.get(beginningHour).timeStart().getHour()));
+                    System.out.println("medelpris");
+                    System.out.println(String.format("%.2f",averageCheapestHours));
                 }
                 case "8h" -> {
                     hoursSelected = eightHours;
@@ -269,7 +292,25 @@ public class Main {
             switch(args[zoneValue]) {
                 // findOptimalCharging4Hours()
                 case "SE1" -> {
+                    int hours4 = 4;
+                    int beginningHour = 0;
+                    for(int i = 0; i < elprisList.size() - hours4; i++) {
+                        for(int j = 0; j < hours4; j++){
+                            medelPriser = medelPriser + elprisList.get(i+j).sekPerKWh();
+                        }
+                        hoursAverage = medelPriser / hours4;
+                        if (hoursAverage < averageCheapestHours) {
+                            averageCheapestHours = hoursAverage;
+                            beginningHour = i;
+                        }
 
+                    }
+
+                    medelPriser = (medelPriser * 100) / hours4;
+                    System.out.println("påbörja laddning");
+                    System.out.println(String.format("%02d",elprisList.get(beginningHour).timeStart().getHour()));
+                    System.out.println("medelpris");
+                    System.out.println(String.format("%.2f",averageCheapestHours));
                 }
 //                case "SE2" -> {
 //
@@ -316,11 +357,11 @@ public class Main {
     }
 
     private static void combinedExpensiveHoursFormat() {
-        combinedExpensiveHours = String.format("%02d-%02d",expensiveHour1,expensiveHour2);
+        combinedExpensiveHours = String.format("%02d-%02d", expensiveHourStart, expensiveHourEnd);
     }
 
     private static void combinedCheapestHoursFormat() {
-        combinedCheapestHours = String.format("%02d-%02d",cheapestHour1,cheapestHour2);
+        combinedCheapestHours = String.format("%02d-%02d", cheapestHourStart, cheapestHourEnd);
     }
 
     private static void convertExpensiveHourValueToOre() {
@@ -334,19 +375,19 @@ public class Main {
     private static void expensiveHourCaculator(ElpriserAPI.Elpris pris) {
         if(pris.sekPerKWh() > expensiveHourValue) {
             expensiveHourValue = pris.sekPerKWh();
-            expensiveHour1 = pris.timeStart().toLocalTime().getHour();
-            expensiveHour2 = pris.timeEnd().toLocalTime().getHour();
+            expensiveHourStart = pris.timeStart().toLocalTime().getHour();
+            expensiveHourEnd = pris.timeEnd().toLocalTime().getHour();
         }
     }
 
     private static void cheapestHourCaculator(ElpriserAPI.Elpris pris) {
         if(pris.sekPerKWh() < cheapestHourValue) {
             cheapestHourValue = pris.sekPerKWh();
-            cheapestHour1 = pris.timeStart().toLocalTime().getHour();
-            cheapestHour2 = pris.timeEnd().toLocalTime().getHour();
+            cheapestHourStart = pris.timeStart().toLocalTime().getHour();
+            cheapestHourEnd = pris.timeEnd().toLocalTime().getHour();
         }
     }
-
+    // Funkar bara om man använder hela listan istället för vissa priser.
     private static double medelPrisCaculator(List<ElpriserAPI.Elpris> elprisList) {
         medelPriser = medelPriser / elprisList.size();
         ultimateMedelPris = medelPriser * 100;
