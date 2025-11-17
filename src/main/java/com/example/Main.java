@@ -259,6 +259,8 @@ public class Main {
 
         } else if(args.length == chargingSelected){
             int hoursSelected = 5;
+            double averageCheapestHours = Double.MAX_VALUE;
+            double hoursAverage = 0.0;
             switch(args[hoursSelected]){
                 case "2h" -> {
                     hoursSelected = twoHours;
@@ -301,6 +303,26 @@ public class Main {
                 // chargingWindowDoesNotUseNextDay_whenNextDayUnavailable()
                 // handleMultipleDaysData_includesNextDayForCharging()
                 case "SE3" -> {
+                    int hours2 = 2;
+                    int beginningHour = 0;
+                    for(int i = 0; i < elprisList.size() - hours2; i++) {
+                        medelPriser = 0.0;
+                        for(int j = 0; j < hours2; j++){
+                            medelPriser = medelPriser + elprisList.get(i+j).sekPerKWh();
+                        }
+                        hoursAverage = medelPriser / hours2;
+                        if (hoursAverage < averageCheapestHours) {
+                            averageCheapestHours = hoursAverage;
+                            beginningHour = i;
+                        }
+
+                    }
+
+                    medelPriser = (medelPriser * 100) / hours2;
+                    System.out.println("påbörja laddning");
+                    System.out.println(String.format("%02d",elprisList.get(beginningHour).timeStart().getHour()));
+                    System.out.println("medelpris");
+                    System.out.println(String.format("%.2f",averageCheapestHours * 100));
 
                 }
                 // findOptimalCharging8Hours()
