@@ -124,7 +124,9 @@ public class Main {
                         }
                         // Fixar den andra (Jag vet inte hur jag kollar om det finns ett andra datum eller ej så man
                         List<ElpriserAPI.Elpris> elprisListTommorow = elpriserAPI.getPriser(secondDate,getPrisKlass(args));
-                        elprisList.addAll(elprisListTommorow);
+                        if(elprisListTommorow != null && !elprisListTommorow.isEmpty()) {
+                            elprisList.addAll(elprisListTommorow);
+                        }
                         choosingOptions(elprisList, args);
                     } else {
                         System.out.println("invalid date");
@@ -219,7 +221,24 @@ public class Main {
                         System.out.println(ultimateMedelPris);
                     }
                     else if(elprisList.size() == 96) {
+                        medelPriser = 0.0;
+                        for(ElpriserAPI.Elpris pris : elprisList) {
+                            cheapestHourCaculator(pris);
+                            expensiveHourCaculator(pris);
+                            medelPriser = medelPriser + pris.sekPerKWh();
+                        }
 
+                        combinedCheapestHoursFormat();
+                        combinedExpensiveHoursFormat();
+                        convertCheapestHourValueToOre();
+                        convertExpensiveHourValueToOre();
+                        ultimateMedelPris = medelPrisCaculator(elprisList);
+
+                        System.out.println(String.format("lägsta pris = %.2f", cheapestHourValue));
+                        System.out.println(combinedCheapestHours);
+                        System.out.println(String.format("högsta pris = %.2f", expensiveHourValue));
+                        System.out.println(combinedExpensiveHours);
+                        System.out.println(String.format("medelpris = %.2f", ultimateMedelPris));
                     }
 
                 }
@@ -305,7 +324,7 @@ public class Main {
                 case "SE3" -> {
                     int hours2 = 2;
                     int beginningHour = 0;
-                    for(int i = 0; i < elprisList.size() - hours2; i++) {
+                    for(int i = 0; i <= elprisList.size() - hours2; i++) {
                         medelPriser = 0.0;
                         for(int j = 0; j < hours2; j++){
                             medelPriser = medelPriser + elprisList.get(i+j).sekPerKWh();
