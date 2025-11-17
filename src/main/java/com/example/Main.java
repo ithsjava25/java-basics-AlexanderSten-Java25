@@ -319,8 +319,8 @@ public class Main {
                     }
 
                     medelPriser = (medelPriser * 100) / hours2;
-                    System.out.println("påbörja laddning");
-                    System.out.println(String.format("%02d",elprisList.get(beginningHour).timeStart().getHour()));
+                    System.out.println("Påbörja laddning");
+                    System.out.println(String.format("%02d:00",elprisList.get(beginningHour).timeStart().getHour()));
                     System.out.println("medelpris");
                     System.out.println(String.format("%.2f",averageCheapestHours * 100));
 
