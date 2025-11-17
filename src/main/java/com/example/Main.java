@@ -2,14 +2,14 @@ package com.example;
 
 import com.example.api.ElpriserAPI;
 
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 public class Main {
     // TODO Omvandla detta till en array/list
@@ -21,25 +21,43 @@ public class Main {
 
 
 
-
+// Args zone/date variables that
     public static int zonePlace = 0;
     public static int zoneValue = 1;
     public static int datePlace = 2;
     public static int dateValue = 3;
     public static int hourSelected = 5;
-
+// How many hours
     public static int twoHours = 0;
     public static int fourHours = 1;
     public static int eightHours = 2;
-
+// Variables for if sorted / charging selected
     public static int sortedSelected = 5;
     public static int chargingSelected = 6;
-
+// Medelpriser variables
     public static double medelPriser = 0.0;
-    public static int ultimateMedelPris = 0;
+    public static double ultimateMedelPris = 0;
+    // Cheapest / Expensive hour - value
+    public static int cheapestHour1;
+    public static int cheapestHour2;
+    public static String combinedCheapestHours;
+    public static int expensiveHour1;
+    public static int expensiveHour2;
+    public static String combinedExpensiveHours;
+    public static double cheapestHourValue = Double.MAX_VALUE;
+    public static double expensiveHourValue = Double.MIN_VALUE;
+
+
+
 
     public static void main(String[] args) {
         ElpriserAPI elpriserAPI = new ElpriserAPI();
+
+        NumberFormat priceValue = NumberFormat.getNumberInstance(Locale.GERMAN);
+        priceValue.setMinimumFractionDigits(2);
+        priceValue.setMaximumIntegerDigits(2);
+
+        // Reset all values that need to be reset
 
         int missingArgumentsOptions = 0;
         int missingDateArgument = 1;
@@ -54,6 +72,7 @@ public class Main {
         // TODO: Försöka komma på ett sätt att lägga in int value från listan till en string. Och samtidigt omvandla den till en int.
         // TODO: Försöka förstå hur jag ska använda <Key, Value> för att fixa detta.
         // TODO: Kom på att jag kan kolla på exemplet på ElpriserAPI
+        // TODO: Försöka fixa ett sätt så alla priser är * med 100
         // Fixat: if args have length 4 or more, it must include: --zone , SE? , --date , 20??-??-??
         // Fixat: if args have length 5, it must include: --sorted
         // Fixat: if args have length 6, it must include: --charging , ?h
@@ -90,6 +109,7 @@ public class Main {
                         if(elprisList.isEmpty()){
                             System.out.println("no data");
                         } else {
+                            // Först gångra sekPerKW med 100 så jag behöver inte göra det vare gång så rätt value kommer ut med öre
                             // Kör igång med själva programmet
                             choosingOptions(elprisList, args);
                         }
@@ -150,7 +170,33 @@ public class Main {
             switch(args[zoneValue]) {
                 // displayMinMaxPrices_withValidData()
                 case "SE1" -> {
+                    medelPriser = 0.0;
+                    for(ElpriserAPI.Elpris pris : elprisList) {
+                        if(pris.sekPerKWh() < cheapestHourValue) {
+                            cheapestHourValue = pris.sekPerKWh();
+                            cheapestHour1 = pris.timeStart().toLocalTime().getHour();
+                            cheapestHour2 = pris.timeEnd().toLocalTime().getHour();
+                        }
+                        if(pris.sekPerKWh() > expensiveHourValue) {
+                            expensiveHourValue = pris.sekPerKWh();
+                            expensiveHour1 = pris.timeStart().toLocalTime().getHour();
+                            expensiveHour2 = pris.timeEnd().toLocalTime().getHour();
+                        }
 
+                        medelPriser = medelPriser + pris.sekPerKWh();
+                    }
+
+                    combinedCheapestHours = String.format("%02d-%02d",cheapestHour1,cheapestHour2);
+                    combinedExpensiveHours = String.format("%02d-%02d",expensiveHour1,expensiveHour2);
+                    cheapestHourValue = cheapestHourValue * 100;
+                    expensiveHourValue = expensiveHourValue * 100;
+                    ultimateMedelPris = medelPrisCaculator(elprisList);
+
+                    System.out.println(String.format("lägsta pris = %.2f", cheapestHourValue));
+                    System.out.println(combinedCheapestHours);
+                    System.out.println(String.format("högsta pris = %.2f", expensiveHourValue));
+                    System.out.println(combinedExpensiveHours);
+                    System.out.println(String.format("medelpris = %.2f", ultimateMedelPris));
                 }
                 case "SE2" -> {
 
@@ -163,8 +209,7 @@ public class Main {
                         for (ElpriserAPI.Elpris pris : elprisList) {
                             medelPriser = medelPriser + pris.sekPerKWh();
                         }
-                        medelPriser = medelPriser / elprisList.size();
-                        ultimateMedelPris = (int) Math.round(medelPriser * 100);
+                        ultimateMedelPris = medelPrisCaculator(elprisList);
                         System.out.println("medelpris");
                         System.out.println(ultimateMedelPris);
                     }
@@ -255,6 +300,17 @@ public class Main {
 //        }
 
 
+    }
+
+    private static double medelPrisCaculator(List<ElpriserAPI.Elpris> elprisList) {
+        medelPriser = medelPriser / elprisList.size();
+        ultimateMedelPris = medelPriser * 100;
+        if (ultimateMedelPris == (int) ultimateMedelPris) {
+            ultimateMedelPris =  Math.round(medelPriser * 100);
+            return ultimateMedelPris;
+        } else {
+            return ultimateMedelPris;
+        }
     }
 
     private static void shallUseThisMaybeLater(String[] args, String[] prisKlassOptions) {
