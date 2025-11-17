@@ -6,10 +6,8 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
+import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Locale;
 
 public class Main {
     // TODO Omvandla detta till en array/list
@@ -17,6 +15,7 @@ public class Main {
 //    public static String zoneSelected = "zone selected";
 //    public static String chargingSelected = "charging selected";
 //    public static String selected2h = "2h selected";
+
 
 
 
@@ -52,7 +51,7 @@ public class Main {
 
     public static void main(String[] args) {
         ElpriserAPI elpriserAPI = new ElpriserAPI();
-
+        Locale.setDefault(Locale.forLanguageTag("sv-SE"));
         NumberFormat priceValue = NumberFormat.getNumberInstance(Locale.GERMAN);
         priceValue.setMinimumFractionDigits(2);
         priceValue.setMaximumIntegerDigits(2);
@@ -73,6 +72,13 @@ public class Main {
         // TODO: Försöka förstå hur jag ska använda <Key, Value> för att fixa detta.
         // TODO: Kom på att jag kan kolla på exemplet på ElpriserAPI
         // TODO: Försöka fixa ett sätt så alla priser är * med 100
+        // TODO: NEED to convert all these methods into a single method
+        //                        cheapestHourCaculator(pris);
+        //                        expensiveHourCaculator(pris);
+        //                        combinedCheapestHoursFormat();
+        //                        combinedExpensiveHoursFormat();
+        //                        convertCheapestHourValueToOre();
+        //                        convertExpensiveHourValueToOre();
         // Fixat: if args have length 4 or more, it must include: --zone , SE? , --date , 20??-??-??
         // Fixat: if args have length 5, it must include: --sorted
         // Fixat: if args have length 6, it must include: --charging , ?h
@@ -109,7 +115,6 @@ public class Main {
                         if(elprisList.isEmpty()){
                             System.out.println("no data");
                         } else {
-                            // Först gångra sekPerKW med 100 så jag behöver inte göra det vare gång så rätt value kommer ut med öre
                             // Kör igång med själva programmet
                             choosingOptions(elprisList, args);
                         }
@@ -215,13 +220,20 @@ public class Main {
             }
 
         } else if (args.length == sortedSelected){
+            List<ElpriserAPI.Elpris> sortedList = new ArrayList<>(elprisList);
             switch(args[zoneValue]) {
 //                case "SE1" -> {
 //
 //                }
                 // displaySortedPrices_whenRequested()
                 case "SE2" -> {
-
+                    sortedList.sort(Comparator.comparingDouble(ElpriserAPI.Elpris::sekPerKWh));
+                    for(ElpriserAPI.Elpris pris : sortedList) {
+                        System.out.println(String.format("%02d-%02d %.2f öre"
+                                ,pris.timeStart().getHour()
+                                ,pris.timeEnd().getHour()
+                                ,(pris.sekPerKWh() * 100)));
+                    }
                 }
 //                case "SE3" -> {
 //
