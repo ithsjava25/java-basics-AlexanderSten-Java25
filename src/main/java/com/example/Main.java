@@ -43,8 +43,13 @@ public class Main {
     public static int expensiveHourStart;
     public static int expensiveHourEnd;
     public static String combinedExpensiveHours;
-    public static double cheapestHourValue = Double.MAX_VALUE;
-    public static double expensiveHourValue = Double.MIN_VALUE;
+    public static double cheapestHourValue = Double.POSITIVE_INFINITY;
+    public static double expensiveHourValue = Double.NEGATIVE_INFINITY;
+    public static double cheapestHourQuarterStart;
+    public static double cheapestHourQuarterEnd;
+    public static double expensiveHourQuarterStart;
+    public static double expensiveHourQuarterEnd;
+
     // Charging hours
     public static double averageCheapestHours = Double.MAX_VALUE;
     public static double hoursAverage = 0.0;
@@ -221,24 +226,43 @@ public class Main {
                         System.out.println(ultimateMedelPris);
                     }
                     else if(elprisList.size() == 96) {
+                        // Jag önskade att det fanns något bättre sätt att hålla koll på vilken timme vi är inne på
                         medelPriser = 0.0;
-                        for(ElpriserAPI.Elpris pris : elprisList) {
-                            cheapestHourCaculator(pris);
-                            expensiveHourCaculator(pris);
-                            medelPriser = medelPriser + pris.sekPerKWh();
+                        cheapestHourValue = Double.POSITIVE_INFINITY;
+                        expensiveHourValue = Double.NEGATIVE_INFINITY;
+                        for(int hour = 0; hour < 24;hour++) {
+                            double summaQuater = 0.0;
+                            for(int j = 0; j < 4; j++) {
+                                int indexHour = hour * 4 + j;
+                                summaQuater = summaQuater + elprisList.get(indexHour).sekPerKWh();
+                            }
+                            double averageHour = summaQuater / 4.0;
+
+                                if(averageHour < cheapestHourValue) {
+                                    cheapestHourValue = averageHour;
+                                    cheapestHourStart = hour;
+                                    cheapestHourEnd = (hour + 1) % 24; // Apperently this is a must because otherwise  it will count to 24;
+                                }
+                                if(averageHour > expensiveHourValue) {
+                                    expensiveHourValue = averageHour;
+                                    expensiveHourStart = hour;
+                                    expensiveHourEnd = (hour + 1) % 24;
+                                }
+
                         }
 
                         combinedCheapestHoursFormat();
                         combinedExpensiveHoursFormat();
-                        convertCheapestHourValueToOre();
-                        convertExpensiveHourValueToOre();
-                        ultimateMedelPris = medelPrisCaculator(elprisList);
+                        // Förstår inte varför dom här 2 methoderna icke fungerar så jag gör det manuelt
+//                      convertCheapestHourValueToOre();
+//                      convertExpensiveHourValueToOre();
+                      ultimateMedelPris = medelPrisQuarterCaculator(elprisList);
 
-                        System.out.println(String.format("lägsta pris = %.2f", cheapestHourValue));
+                        System.out.println(String.format("lägsta pris = %.2f", cheapestHourValue * 100));
                         System.out.println(combinedCheapestHours);
-                        System.out.println(String.format("högsta pris = %.2f", expensiveHourValue));
+                        System.out.println(String.format("högsta pris = %.2f", expensiveHourValue * 100));
                         System.out.println(combinedExpensiveHours);
-                        System.out.println(String.format("medelpris = %.2f", ultimateMedelPris));
+                        System.out.println(String.format("Medelpris: %.2f öre", ultimateMedelPris));
                     }
 
                 }
@@ -431,15 +455,33 @@ public class Main {
         }
     }
     // Funkar bara om man använder hela listan istället för vissa priser.
+//    private static double medelPrisCaculator(List<ElpriserAPI.Elpris> elprisList) {
+//        medelPriser = medelPriser / elprisList.size();
+//        ultimateMedelPris = medelPriser * 100;
+//        if (ultimateMedelPris == (int) ultimateMedelPris) {
+//            ultimateMedelPris =  Math.round(medelPriser * 100);
+//            return ultimateMedelPris;
+//        } else {
+//            return ultimateMedelPris;
+//        }
+//    }
+
     private static double medelPrisCaculator(List<ElpriserAPI.Elpris> elprisList) {
-        medelPriser = medelPriser / elprisList.size();
-        ultimateMedelPris = medelPriser * 100;
-        if (ultimateMedelPris == (int) ultimateMedelPris) {
-            ultimateMedelPris =  Math.round(medelPriser * 100);
-            return ultimateMedelPris;
-        } else {
-            return ultimateMedelPris;
+        double summa = 0.0;
+        for(ElpriserAPI.Elpris pris : elprisList) {
+            summa = summa + pris.sekPerKWh();
         }
+        double medelPris = summa / elprisList.size();
+        return  medelPris * 100;
+    }
+
+    private static double medelPrisQuarterCaculator(List<ElpriserAPI.Elpris> elprisList) {
+        double summa = 0.0;
+        for(ElpriserAPI.Elpris pris : elprisList) {
+            summa = summa + pris.sekPerKWh();
+        }
+        double medelPris = summa / elprisList.size();
+        return medelPris * 100;
     }
 
     private static void shallUseThisMaybeLater(String[] args, String[] prisKlassOptions) {
