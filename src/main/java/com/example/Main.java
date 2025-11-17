@@ -265,25 +265,6 @@ public class Main {
                 }
                 case "4h" -> {
                     hoursSelected = fourHours;
-                    int hours4 = 4;
-                    int beginningHour = 0;
-                    for(int i = 0; i < elprisList.size() - hours4; i++) {
-                        for(int j = 0; j < hours4; j++){
-                            medelPriser = medelPriser + elprisList.get(i+j).sekPerKWh();
-                        }
-                        hoursAverage = medelPriser / hours4;
-                        if (hoursAverage < averageCheapestHours) {
-                            averageCheapestHours = hoursAverage;
-                            beginningHour = i;
-                        }
-
-                    }
-
-                    medelPriser = (medelPriser * 100) / hours4;
-                    System.out.println("påbörja laddning");
-                    System.out.println(String.format("%02d",elprisList.get(beginningHour).timeStart().getHour()));
-                    System.out.println("medelpris");
-                    System.out.println(String.format("%.2f",averageCheapestHours));
                 }
                 case "8h" -> {
                     hoursSelected = eightHours;
@@ -295,6 +276,7 @@ public class Main {
                     int hours4 = 4;
                     int beginningHour = 0;
                     for(int i = 0; i < elprisList.size() - hours4; i++) {
+                        medelPriser = 0.0;
                         for(int j = 0; j < hours4; j++){
                             medelPriser = medelPriser + elprisList.get(i+j).sekPerKWh();
                         }
@@ -310,7 +292,7 @@ public class Main {
                     System.out.println("påbörja laddning");
                     System.out.println(String.format("%02d",elprisList.get(beginningHour).timeStart().getHour()));
                     System.out.println("medelpris");
-                    System.out.println(String.format("%.2f",averageCheapestHours));
+                    System.out.println(String.format("%.2f",averageCheapestHours * 100));
                 }
 //                case "SE2" -> {
 //
