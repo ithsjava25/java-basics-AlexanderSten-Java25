@@ -172,24 +172,15 @@ public class Main {
                 case "SE1" -> {
                     medelPriser = 0.0;
                     for(ElpriserAPI.Elpris pris : elprisList) {
-                        if(pris.sekPerKWh() < cheapestHourValue) {
-                            cheapestHourValue = pris.sekPerKWh();
-                            cheapestHour1 = pris.timeStart().toLocalTime().getHour();
-                            cheapestHour2 = pris.timeEnd().toLocalTime().getHour();
-                        }
-                        if(pris.sekPerKWh() > expensiveHourValue) {
-                            expensiveHourValue = pris.sekPerKWh();
-                            expensiveHour1 = pris.timeStart().toLocalTime().getHour();
-                            expensiveHour2 = pris.timeEnd().toLocalTime().getHour();
-                        }
-
+                        cheapestHourCaculator(pris);
+                        expensiveHourCaculator(pris);
                         medelPriser = medelPriser + pris.sekPerKWh();
                     }
 
-                    combinedCheapestHours = String.format("%02d-%02d",cheapestHour1,cheapestHour2);
-                    combinedExpensiveHours = String.format("%02d-%02d",expensiveHour1,expensiveHour2);
-                    cheapestHourValue = cheapestHourValue * 100;
-                    expensiveHourValue = expensiveHourValue * 100;
+                    combinedCheapestHoursFormat();
+                    combinedExpensiveHoursFormat();
+                    convertCheapestHourValueToOre();
+                    convertExpensiveHourValueToOre();
                     ultimateMedelPris = medelPrisCaculator(elprisList);
 
                     System.out.println(String.format("lägsta pris = %.2f", cheapestHourValue));
@@ -300,6 +291,38 @@ public class Main {
 //        }
 
 
+    }
+
+    private static void combinedExpensiveHoursFormat() {
+        combinedExpensiveHours = String.format("%02d-%02d",expensiveHour1,expensiveHour2);
+    }
+
+    private static void combinedCheapestHoursFormat() {
+        combinedCheapestHours = String.format("%02d-%02d",cheapestHour1,cheapestHour2);
+    }
+
+    private static void convertExpensiveHourValueToOre() {
+        expensiveHourValue = expensiveHourValue * 100;
+    }
+
+    private static void convertCheapestHourValueToOre() {
+        cheapestHourValue = cheapestHourValue * 100;
+    }
+
+    private static void expensiveHourCaculator(ElpriserAPI.Elpris pris) {
+        if(pris.sekPerKWh() > expensiveHourValue) {
+            expensiveHourValue = pris.sekPerKWh();
+            expensiveHour1 = pris.timeStart().toLocalTime().getHour();
+            expensiveHour2 = pris.timeEnd().toLocalTime().getHour();
+        }
+    }
+
+    private static void cheapestHourCaculator(ElpriserAPI.Elpris pris) {
+        if(pris.sekPerKWh() < cheapestHourValue) {
+            cheapestHourValue = pris.sekPerKWh();
+            cheapestHour1 = pris.timeStart().toLocalTime().getHour();
+            cheapestHour2 = pris.timeEnd().toLocalTime().getHour();
+        }
     }
 
     private static double medelPrisCaculator(List<ElpriserAPI.Elpris> elprisList) {
