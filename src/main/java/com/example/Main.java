@@ -227,12 +227,17 @@ public class Main {
 //                }
                 // displaySortedPrices_whenRequested()
                 case "SE2" -> {
+                    String hours;
+                    String priset;
                     sortedList.sort(Comparator.comparingDouble(ElpriserAPI.Elpris::sekPerKWh));
                     for(ElpriserAPI.Elpris pris : sortedList) {
-                        System.out.println(String.format("%02d-%02d %.2f öre"
+                        hours = String.format("%02d-%02d"
                                 ,pris.timeStart().getHour()
-                                ,pris.timeEnd().getHour()
-                                ,(pris.sekPerKWh() * 100)));
+                                ,pris.timeEnd().getHour());
+
+                        priset = String.format("%.2f öre",pris.sekPerKWh() * 100);
+
+                        System.out.println(hours + " " + priset);
                     }
                 }
 //                case "SE3" -> {
