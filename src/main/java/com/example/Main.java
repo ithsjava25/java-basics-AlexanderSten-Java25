@@ -327,6 +327,26 @@ public class Main {
                 }
                 // findOptimalCharging8Hours()
                 case "SE4" ->{
+                    int hours8 = 8;
+                    int beginningHour = 0;
+                    for(int i = 0; i < elprisList.size() - hours8; i++) {
+                        medelPriser = 0.0;
+                        for(int j = 0; j < hours8; j++){
+                            medelPriser = medelPriser + elprisList.get(i+j).sekPerKWh();
+                        }
+                        hoursAverage = medelPriser / hours8;
+                        if (hoursAverage < averageCheapestHours) {
+                            averageCheapestHours = hoursAverage;
+                            beginningHour = i;
+                        }
+
+                    }
+
+                    medelPriser = (medelPriser * 100) / hours8;
+                    System.out.println("påbörja laddning");
+                    System.out.println(String.format("kl %02d:00d",elprisList.get(beginningHour).timeStart().getHour()));
+                    System.out.println("medelpris");
+                    System.out.println(String.format("Medelpris för fönster: %.2f öre",averageCheapestHours * 100));
 
                 }
             }
